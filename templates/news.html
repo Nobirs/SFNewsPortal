@@ -1,0 +1,31 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+Popular News
+{% endblock title %}
+
+{% block content %}
+<h1>Самые последние новости!!!</h1>
+<h2>Кол-во: {{ news|length }}</h2>
+    {% if news %}
+        <ul>
+            {% for post in news %}
+                <li>
+<!--                    {{ post.title|truncatechars:15 }}-->
+<!--                    {{ post.creation_datetime|date:'M d Y' }}-->
+<!--                    {{ post.text|truncatewords:20 }}-->
+                    <h2><a href="/news/{{ post.id }}">{{ post.title|censor }}</a></h2>
+                    <h4>Категории: {{ post.get_categories }}</h4>
+                    <h6>Дата добавления: {{ post.creation_datetime|date:'M d Y' }}</h6>
+                    <b>Рейтинг: {{ post.rating }}</b>
+                    <p>Автор: {{ post.post_author.author_user.username }}</p>
+                    <hr>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <h3>К сожалению на сайте в данный момент нет новостей!</h3>
+    {% endif %}
+{% endblock content %}
