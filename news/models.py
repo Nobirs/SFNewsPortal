@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
+from django.urls import reverse
 
 
 class Author(models.Model):
@@ -68,6 +69,14 @@ class Post(models.Model):
         for category in self.post_category.all():
             categories_names += category.name + ", "
         return categories_names[:-2]
+
+    def get_absolute_url(self):
+        reverse_url = reverse('post_detail', args=[str(self.id)])
+        if self.category_type == 'NW' and 'articles' in reverse_url:
+            reverse_url = reverse_url.replace('articles', 'news')
+        elif self.category_type == 'AR' and 'news' in reverse_url:
+            reverse_url = reverse_url.replace('news', 'articles')
+        return reverse_url
 
     def __str__(self):
         return f'[{self.creation_datetime}] ({self.rating})  {self.title} [{self.post_author.author_user.username}]'

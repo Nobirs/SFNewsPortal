@@ -1,15 +1,21 @@
 {% extends 'flatpages/default.html' %}
 
-{% load custom_filters %}
 {% load custom_tags %}
+{% load custom_filters %}
 
-{% block title %}
-Popular News
-{% endblock title %}
+{% block title %}Search post{% endblock title %}
+
+{% block navbar %}
+<li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'home' %}">Home</a></li>
+<li class="nav-item"><a class="nav-link active" href="{% url 'search' %}">Search</a></li>
+{% endblock navbar %}
 
 {% block content %}
-<h1>Самые последние новости!!!</h1>
-    {% if news %}
+<form action="" method="get">
+       {{ filter.form.as_p }}
+       <input type="submit" value="Найти" />
+   </form>
+{% if news %}
         <ul>
             {% for post in news %}
                 <li>
@@ -23,7 +29,7 @@ Popular News
             {% endfor %}
         </ul>
     {% else %}
-        <h3>К сожалению на сайте в данный момент нет новостей!</h3>
+        <h3>К сожалению на сайте нет новостей с заданными критериями!</h3>
     {% endif %}
 <!-- Pagination -->
 {% if page_obj.has_previous %}
@@ -33,9 +39,9 @@ Popular News
             <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
         {% endif %}
 {% endif %}
-
+{% if news %}
     {{ page_obj.number }}
-
+{% endif %}
    {% if page_obj.has_next %}
        <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
        {% if paginator.num_pages != page_obj.next_page_number %}
