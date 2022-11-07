@@ -1,5 +1,6 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.utils.decorators import classonlymethod
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -44,10 +45,12 @@ class NewsSearchList(ListView):
         return context
 
 
-class PostCreate(CreateView):
+class PostCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.add_post')
     model = Post
     form_class = PostForm
     template_name = 'edit_post.html'
+    raise_exception = True
 
     def form_valid(self, form):
         post = form.save(commit=False)
@@ -59,10 +62,12 @@ class PostCreate(CreateView):
         return super().form_valid(form)
 
 
-class PostUpdate(UpdateView):
+class PostUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news.change_post')
     model = Post
     form_class = PostForm
     template_name = 'edit_post.html'
+    raise_exception = True
 
     def form_valid(self, form):
         post_form = form.save(commit=False)
@@ -74,10 +79,12 @@ class PostUpdate(UpdateView):
         return super().form_valid(form)
 
 
-class PostDelete(DeleteView):
+class PostDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('news.delete_post')
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('home')
+    raise_exception = True
 
 
 def update_redirect_nw_ar_if_needed(request, pk):

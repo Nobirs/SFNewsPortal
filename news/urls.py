@@ -11,7 +11,7 @@ from .views import (NewsList,
 
 urlpatterns = [
     path('', NewsList.as_view(), name='home'),
-    path('<int:pk>', PostDetail.as_view(), name='post_detail'),
+    path('<int:pk>/', PostDetail.as_view(), name='post_detail'),
     path('search/', NewsSearchList.as_view(), name='search'),
 
     # See PostCreate.form_valid method for more info

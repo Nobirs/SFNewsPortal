@@ -1,0 +1,44 @@
+{% extends 'flatpages/default.html' %}
+
+{% load static %}
+
+{% block links %}
+<link href="{% static 'css/login_styles.css' %}" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.gstatic.com">
+{% endblock links %}
+
+
+{% block content %}
+<div class="container">
+  <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+    <p>Welcome</p>
+      <ul class="errorlist nonfield">
+          {% if form.errors %}
+            {% for field, error in form.errors.items %}
+                <li>{{ field }} - {{ error }}</li>
+            {% endfor %}
+          {% endif %}
+      </ul>
+      <input type="text" name="username" placeholder="username"><br>
+    <input type="password" name="password" placeholder="Password"><br>
+    <input type="submit" value="Login"><br>
+    <input type="hidden" name="next" value="{{ next }}"><br>
+  </form>
+
+  <div class="drops">
+    <div class="drop drop-1"></div>
+    <div class="drop drop-2"></div>
+    <div class="drop drop-3"></div>
+    <div class="drop drop-4"></div>
+    <div class="drop drop-5"></div>
+  </div>
+</div>
+<!--<form method="post" action="{% url 'login' %}">-->
+<!--{% csrf_token %}-->
+<!--    {{ form.as_p }}-->
+<!--    <input type="submit" value="login">-->
+<!--    <input type="hidden" name="next" value="{{ next }}">-->
+<!--</form>-->
+
+{% endblock %}
