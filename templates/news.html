@@ -10,7 +10,8 @@ Popular News
 {% block content %}
 <h1>Самые последние новости!!!</h1>
     {% if perms.news.add_post %}
-    <a href="{% url 'create' %}">Add Post</a>
+    <a href="{% url 'create_news' %}">Add News</a>
+    <a href="{% url 'create_article' %}">Add Article</a>
     {% endif %}
     {% if news %}
         <ul>
@@ -21,9 +22,10 @@ Popular News
                     <h6>Дата добавления: {{ post.creation_datetime|date:'M d Y' }}</h6>
                     <b>Рейтинг: {{ post.rating }}</b>
                     <p>Автор: {{ post.post_author.author_user.username }}</p>
-                    {% if perms.news.change_post %}
+                    {% if perms.news.change_post  and post.post_author.author_user == request.user %}
                     <a href="{% url 'update' pk=post.id %}">Update</a>
                     {% endif %}
+                    <!-- At the moment only superuser can delete post, even author of the post cannot... -->
                     {% if perms.news.delete_post %}
                     <a href="{% url 'delete' pk=post.id %}">Delete</a>
                     {% endif %}

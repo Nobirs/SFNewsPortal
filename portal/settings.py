@@ -13,6 +13,13 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+
+load_dotenv()
+env_path = Path('.')/'.env'
+load_dotenv(dotenv_path=env_path)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -86,10 +93,10 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 WSGI_APPLICATION = 'portal.wsgi.application'
@@ -157,3 +164,7 @@ LOGIN_REDIRECT_URL = '/news'
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
 
 SITE_ID = 1
+
+# email settings
+ROOT_EMAIL = os.getenv('ROOT_EMAIL')
+EMAIL_PASSWORD = os.getenv('ROOT_EMAIL_PASSWORD')

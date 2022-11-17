@@ -24,6 +24,12 @@
                         <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'search' %}">Search</a></li>
                         {% endblock navbar %}
+                        {% if not request.user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Sign In</a></li>
+                        {% else %}
+                            <li class="nav-item" ><a class="nav-link" href="{% url 'account_logout' %}">Log Out</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

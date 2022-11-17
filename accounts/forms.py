@@ -6,12 +6,12 @@ from django.contrib.auth.models import User, Group
 from allauth.account.forms import SignupForm
 
 
-
 class CustomSignupForm(SignupForm):
     def save(self, request):
         user = super().save(request)
         commoners = Group.objects.get(name='commoners')
         user.groups.add(commoners)
+        return user
 
 
 class SignUpForm(UserCreationForm):

@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from .models import Post
+from .models import Post, Author
 from .filters import PostFilter
 from .forms import PostForm
 
@@ -15,6 +15,11 @@ class NewsList(ListView):
     template_name = 'news.html'
     context_object_name = 'news'
     paginate_by = 2
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['is_authenticated'] = self.request.user.is_authenticated
+    #     return context
 
 
 class PostDetail(DetailView):
@@ -55,10 +60,15 @@ class PostCreate(PermissionRequiredMixin, CreateView):
     def form_valid(self, form):
         post = form.save(commit=False)
         # Add category_type to form using url
-        if 'news' in str(self.request.path):
+        if 'create_news' in str(self.request.path):
             post.category_type = 'NW'
-        elif 'articles' in str(self.request.path):
+        elif 'create_article' in str(self.request.path):
             post.category_type = 'AR'
+
+        # If POST is used - add post author
+        if self.request.POST:
+            print(self.request.POST)
+            post.post_author = Author.objects.get(author_user=self.request.user)
         return super().form_valid(form)
 
 

@@ -72,10 +72,6 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         reverse_url = reverse('post_detail', args=[str(self.id)])
-        if self.category_type == 'NW' and 'articles' in reverse_url:
-            reverse_url = reverse_url.replace('articles', 'news')
-        elif self.category_type == 'AR' and 'news' in reverse_url:
-            reverse_url = reverse_url.replace('news', 'articles')
         return reverse_url
 
     def __str__(self):

@@ -9,7 +9,6 @@ class PostForm(forms.ModelForm):
                   'text',
                   'rating',
                   'post_category',
-                  'post_author',
                   ]
 
     def is_valid(self):
