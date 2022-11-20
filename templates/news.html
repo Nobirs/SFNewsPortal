@@ -2,6 +2,7 @@
 
 {% load custom_filters %}
 {% load custom_tags %}
+{% load cache %}
 
 {% block title %}
 Popular News
@@ -12,6 +13,7 @@ Popular News
     {% if perms.news.add_post %}
     <p class="text-center"><a class="btn btn-secondary btn-sm" href="{% url 'create_news' %}">Add News</a> <a class="btn btn-secondary btn-sm" href="{% url 'create_article' %}">Add Article</a></p>
     {% endif %}
+    {% cache 10 postsList %}
     {% if news %}
         <ul>
             {% for post in news %}
@@ -38,6 +40,7 @@ Popular News
     {% else %}
         <h3>К сожалению на сайте в данный момент нет новостей!</h3>
     {% endif %}
+    {% endcache %}
 <!-- Pagination -->
 {% if page_obj.has_previous %}
         <a href="?{% url_replace page=1 %}">1</a>

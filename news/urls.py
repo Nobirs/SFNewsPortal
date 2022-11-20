@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.decorators.cache import cache_page
 from .views import (NewsList,
                     PostDetail,
                     NewsSearchList,
@@ -12,7 +13,7 @@ from .views import (NewsList,
 
 
 urlpatterns = [
-    path('', NewsList.as_view(), name='home'),
+    path('', cache_page(60)(NewsList.as_view()), name='home'),
     path('<int:pk>/', PostDetail.as_view(), name='post_detail'),
     path('search/', NewsSearchList.as_view(), name='search'),
 

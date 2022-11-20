@@ -1,6 +1,7 @@
 from datetime import date
 
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.conf import settings
 from django.db.models import Sum
 from django.urls import reverse
@@ -67,6 +68,11 @@ class Post(models.Model):
 
     post_author = models.ForeignKey(Author, on_delete=models.CASCADE)
     post_category = models.ManyToManyField(Category, through='PostCategory')
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.delete(f'post-{self.pk}')
+        print("Post was saved and deleted from cache...")
 
     def like(self):
         self.rating += 1

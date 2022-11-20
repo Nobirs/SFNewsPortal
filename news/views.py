@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.template.loader import render_to_string
 from django.contrib.auth.models import Group
+from django.core.cache import cache
 from django.conf import settings
 
 from .models import Post, Author, Category
@@ -81,6 +82,19 @@ class PostDetail(DetailView):
         context['categories'] = self.object.get_categories()
         context['is_author'] = user_is_author(self.request)
         return context
+
+    def get_object(self, *args, **kwargs):
+        print("In method get_object:")
+        obj = cache.get(f'post-{self.kwargs["pk"]}', None)
+        if obj:
+            print('Get object from cache: ', obj)
+
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'post-{self.kwargs["pk"]}', obj)
+            print("Object not in cached. Get object and cache it...", obj)
+        return obj
+
 
 
 class NewsSearchList(ListView):
