@@ -5,8 +5,9 @@ from .views import (NewsList,
                     PostCreate,
                     PostUpdate,
                     PostDelete,
-                    update_redirect_nw_ar_if_needed,
-                    delete_redirect_nw_ar_if_needed,
+                    CategoryPostsList,
+                    subscribe,
+                    add_new_author,
                     )
 
 
@@ -21,4 +22,10 @@ urlpatterns = [
 
     path('<int:pk>/update/', PostUpdate.as_view(), name='update'),
     path('<int:pk>/delete/', PostDelete.as_view(), name='delete'),
+
+    path('category/<int:pk>/', CategoryPostsList.as_view(), name='category_posts'),
+
+    path('category/<int:pk>/subscribe/', subscribe, name='subscribe'),
+
+    path('add_new_author/', add_new_author, name='add_new_author'),
 ]

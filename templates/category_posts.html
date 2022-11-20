@@ -4,11 +4,17 @@
 {% load custom_tags %}
 
 {% block title %}
-Popular News
+{{ category.name }}
 {% endblock title %}
 
+
 {% block content %}
-<h1><p class="text-center">Новости:</p></h1>
+<h1 class="text-center">Новости категории: {{ category.name }}</h1>
+{% if is_not_subscriber %}
+    <p class="text-center"><a class="btn btn-secondary btn-sm" href="{% url 'subscribe' category.id %}">Subscribe</a></p>
+{% else %}
+    <p class="text-center">Вы подписаны на данную категорию...</p>
+{% endif %}
     {% if perms.news.add_post %}
     <p class="text-center"><a class="btn btn-secondary btn-sm" href="{% url 'create_news' %}">Add News</a> <a class="btn btn-secondary btn-sm" href="{% url 'create_article' %}">Add Article</a></p>
     {% endif %}

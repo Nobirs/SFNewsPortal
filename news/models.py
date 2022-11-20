@@ -1,7 +1,10 @@
-from django.db import models
+from datetime import date
+
 from django.contrib.auth.models import User
+from django.conf import settings
 from django.db.models import Sum
 from django.urls import reverse
+from django.db import models
 
 
 class Author(models.Model):
@@ -22,12 +25,27 @@ class Author(models.Model):
         self.rating = author_rating
         self.save()
 
+    def post_creation_limit(self):
+        """ Return True if author cannot add another posts today.
+            Post limit checked from settings POSTS_LIMIT_PER_AUTHOR."""
+        today = date.today()
+        todays_posts = self.post_set.filter(creation_datetime__contains=today)
+        if len(todays_posts) >= settings.POSTS_LIMIT_PER_AUTHOR:
+            return True
+        else:
+            return False
+
     def __str__(self):
         return self.author_user.username
 
 
 class Category(models.Model):
     name = models.CharField(max_length=32, unique=True)
+    subscribers = models.ManyToManyField(User, related_name='categories')
+
+    def get_absolute_url(self):
+        reverse_url = reverse('category_posts', args=[str(self.id)])
+        return reverse_url
 
     def __str__(self):
         return str(self.name)
@@ -70,9 +88,16 @@ class Post(models.Model):
             categories_names += category.name + ", "
         return categories_names[:-2]
 
+    def get_categories_objects(self):
+        return list(self.post_category.all())
+
     def get_absolute_url(self):
         reverse_url = reverse('post_detail', args=[str(self.id)])
         return reverse_url
+
+    def get_full_url(self):
+        reverse_url = self.get_absolute_url()
+        return f'{settings.SITE_URL}/{reverse_url}'
 
     def __str__(self):
         return f'[{self.creation_datetime}] ({self.rating})  {self.title} [{self.post_author.author_user.username}]'

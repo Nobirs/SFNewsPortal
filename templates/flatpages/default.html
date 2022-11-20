@@ -30,6 +30,9 @@
                         {% else %}
                             <li class="nav-item" ><a class="nav-link" href="{% url 'account_logout' %}">Log Out</a></li>
                         {% endif %}
+                        {% if request.user.is_authenticated and not is_author %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'add_new_author' %}">Become an author</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

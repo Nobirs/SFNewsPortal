@@ -1,12 +1,40 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect
+from django.core.exceptions import ObjectDoesNotExist
+from django.template.loader import render_to_string
+from django.contrib.auth.models import Group
+from django.conf import settings
+
+from .models import Post, Author, Category
 from django.urls import reverse_lazy
-from .models import Post, Author
 from .filters import PostFilter
 from .forms import PostForm
+
+import os
+
+
+def user_is_author(request):
+    """Return False if user is registered(but not as author).
+       Return True if user is not registered or registered as Author"""
+    if not request.user.is_authenticated:
+        return True
+    else:
+        user_id = request.user.id
+        try:
+            author = Author.objects.get(pk=user_id)
+            return True
+        except ObjectDoesNotExist:
+            return False
+
+
+def add_new_author(request):
+    new_author = Author(author_user=request.user)
+    authors_group = Group.objects.get(name='authors')
+    authors_group.user_set.add(request.user)
+    new_author.save()
+    return redirect('home')
 
 
 class NewsList(ListView):
@@ -14,12 +42,33 @@ class NewsList(ListView):
     ordering = '-rating'
     template_name = 'news.html'
     context_object_name = 'news'
-    paginate_by = 2
+    paginate_by = 4
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['is_authenticated'] = self.request.user.is_authenticated
-    #     return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_author'] = user_is_author(self.request)
+        return context
+
+
+class CategoryPostsList(ListView):
+    model=Post
+    ordering = '-creation_datetime'
+    template_name = 'category_posts.html'
+    context_object_name = 'news'
+    paginate_by = 4
+
+    def get_queryset(self):
+        if not hasattr(self, 'category'):
+            self.category = get_object_or_404(Category, id=self.kwargs['pk'])
+        queryset = self.category.post_set.all().order_by('-creation_datetime')
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = Category.objects.get(id=self.kwargs['pk'])
+        context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
+        context['is_author'] = user_is_author(self.request)
+        return context
 
 
 class PostDetail(DetailView):
@@ -30,6 +79,7 @@ class PostDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = self.object.get_categories()
+        context['is_author'] = user_is_author(self.request)
         return context
 
 
@@ -47,6 +97,7 @@ class NewsSearchList(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filter'] = self.filterset
+        context['is_author'] = user_is_author(self.request)
         return context
 
 
@@ -56,6 +107,12 @@ class PostCreate(PermissionRequiredMixin, CreateView):
     form_class = PostForm
     template_name = 'edit_post.html'
     raise_exception = True
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_author'] = user_is_author(self.request)
+        context['post_creation_at_limit'] = Author.objects.get(id=self.request.user.id).post_creation_limit()
+        return context
 
     def form_valid(self, form):
         post = form.save(commit=False)
@@ -67,7 +124,6 @@ class PostCreate(PermissionRequiredMixin, CreateView):
 
         # If POST is used - add post author
         if self.request.POST:
-            print(self.request.POST)
             post.post_author = Author.objects.get(author_user=self.request.user)
         return super().form_valid(form)
 
@@ -97,25 +153,8 @@ class PostDelete(PermissionRequiredMixin, DeleteView):
     raise_exception = True
 
 
-def update_redirect_nw_ar_if_needed(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-
-    if post.category_type == 'NW' and 'news' not in request.path:
-        return HttpResponseRedirect(f'/news/{pk}/update/')
-    elif post.category_type == 'AR' and 'articles' not in request.path:
-        return HttpResponseRedirect(f'/articles/{pk}/update/')
-    else:
-        view = PostUpdate.as_view()
-        return view(request, pk=pk)
-
-
-def delete_redirect_nw_ar_if_needed(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-
-    if post.category_type == 'NW' and 'news' not in request.path:
-        return HttpResponseRedirect(f'/news/{pk}/delete/')
-    elif post.category_type == 'AR' and 'articles' not in request.path:
-        return HttpResponseRedirect(f'/articles/{pk}/delete/')
-    else:
-        view = PostDelete.as_view()
-        return view(request, pk=pk)
+@login_required
+def subscribe(request, pk):
+    category = Category.objects.get(id=pk)
+    category.subscribers.add(request.user)
+    return redirect(category)

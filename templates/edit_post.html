@@ -1,6 +1,9 @@
 {% extends 'flatpages/default.html' %}
 
 {% block content %}
+{% if post_creation_at_limit %}
+<h2><p class="text-center">You used your limit for today</p></h2>
+{% else %}
 <h1>Post</h1>
 <hr>
 <form action="" method="post">
@@ -8,4 +11,5 @@
     {{ form.as_p }}
     <input type="submit" value="Save" />
 </form>
+{% endif %}
 {% endblock content %}

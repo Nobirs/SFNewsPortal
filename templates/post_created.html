@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новая статья в твоём любимом разделе {{ category }}!</title>
+</head>
+<body>
+    <h2>Новая <a href="{{ link }}">статья</a> в разделе {{ category }}</h2>
+    <h3>{{ post.title }}</h3>
+    <p> {{ post.text|truncatechars:50 }} </p>
+</body>
+</html>

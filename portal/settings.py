@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
-env_path = Path('.')/'.env'
+env_path = Path('..')/'.env'
 load_dotenv(dotenv_path=env_path)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'news',
+    'news.apps.NewsConfig',
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django_filters',
@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.yandex',
+    # apscheduler
+    'django_apscheduler',
 ]
 
 MIDDLEWARE = [
@@ -93,11 +95,21 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
-ACCOUNT_EMAIL_REQUIRED = False
+
+# email settings
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_USE_SSL = True
+EMAIL_PORT = 465
+
+ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'username'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 WSGI_APPLICATION = 'portal.wsgi.application'
 
@@ -165,6 +177,10 @@ ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
 
 SITE_ID = 1
 
-# email settings
-ROOT_EMAIL = os.getenv('ROOT_EMAIL')
-EMAIL_PASSWORD = os.getenv('ROOT_EMAIL_PASSWORD')
+SITE_URL = 'http://127.0.0.1:8000'
+
+POSTS_LIMIT_PER_AUTHOR = 3
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+
+APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds

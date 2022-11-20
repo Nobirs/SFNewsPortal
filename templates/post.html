@@ -19,8 +19,7 @@
 <!-- If post_author is user - he can update this post -->
 {% if post.post_author.author_user == request.user %}
 <hr>
-<a href="{% url 'update' pk=post.id %}">Update</a>
-<hr>
+<p style="text-align:right"><a class="btn btn-secondary btn-sm" href="{% url 'update' pk=post.id %}">Update</a></p>
 {% endif %}
 <!--                                                  -->
 {% endblock content %}

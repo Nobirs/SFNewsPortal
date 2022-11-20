@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список новостей за последнюю неделю в разделе {{ category }}!</title>
+</head>
+<body>
+    {% if posts %}
+        {% for post in posts %}
+            <p>
+                Статья <a href="{{ post.get_full_url }}">{{ post.title }}</a><br>
+                <small>{{ post.preview }}</small>
+                <hr>
+            </p>
+        {% endfor %}
+    {% else %}
+        <h2>К сожалению, в данном разделе за последнюю неделю нет новых публикаций...</h2>
+    {% endif %}
+</body>
+</html>
