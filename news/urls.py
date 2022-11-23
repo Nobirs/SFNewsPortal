@@ -7,7 +7,9 @@ from .views import (NewsList,
                     PostUpdate,
                     PostDelete,
                     CategoryPostsList,
-                    subscribe,
+                    subscribe,sudo clear
+sudo reboot
+
                     add_new_author,
                     )
 
