@@ -26,6 +26,7 @@ class Author(models.Model):
         self.rating = author_rating
         self.save()
 
+    @property
     def post_creation_limit(self):
         """ Return True if author cannot add another posts today.
             Post limit checked from settings POSTS_LIMIT_PER_AUTHOR."""
@@ -106,7 +107,7 @@ class Post(models.Model):
         return f'{settings.SITE_URL}/{reverse_url}'
 
     def __str__(self):
-        return f'[{self.creation_datetime}] ({self.rating})  {self.title} [{self.post_author.author_user.username}]'
+        return f'[{str(self.creation_datetime)[:19]}] ({self.rating})  {self.title} [{self.post_author.author_user.username}]'
 
 
 class PostCategory(models.Model):
@@ -131,4 +132,4 @@ class Comment(models.Model):
         self.save()
 
     def __str__(self):
-        return f'[{self.creation_datetime}] [{self.rating}] ({self.comment_user.username})'
+        return f'[{str(self.creation_datetime)[:19]}] [{self.rating}] ({self.comment_user.username})'
