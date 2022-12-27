@@ -1,6 +1,9 @@
 from django.contrib import admin
 from .models import Author, Category, Comment, PostCategory, Post
 
+import logging
+logger = logging.getLogger('django')
+
 
 class AuthorAdmin(admin.ModelAdmin):
     list_display = ['author_user', 'rating', 'post_creation_limit']
@@ -27,6 +30,14 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'rating', 'creation_datetime', 'category_type', 'post_author']
     list_filter = ['rating', 'creation_datetime', 'category_type']
     search_fields = ['title__icontains', 'text__icontains']
+    actions = ['delete_posts_with_test_in_title']
+
+    @admin.action(description='Delete posts with "test" in title(you need to choose all posts)')
+    def delete_posts_with_test_in_title(self, request, queryset):
+        for post in queryset:
+            if 'test' in post.title:
+                post.delete()
+                logger.warning(f"{post} --> was deleted...")
 
 
 admin.site.register(Author, AuthorAdmin)

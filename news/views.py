@@ -16,6 +16,9 @@ from .filters import PostFilter
 from .forms import PostForm
 
 import os
+import logging
+
+logger = logging.getLogger('django')
 
 
 def user_is_author(request):
@@ -86,17 +89,16 @@ class PostDetail(DetailView):
         return context
 
     def get_object(self, *args, **kwargs):
-        print("In method get_object:")
+        logger.info("In method get_object.")
         obj = cache.get(f'post-{self.kwargs["pk"]}', None)
         if obj:
-            print('Get object from cache: ', obj)
+            logger.info(f'Get object from cache: {obj}')
 
         if not obj:
             obj = super().get_object(queryset=self.queryset)
             cache.set(f'post-{self.kwargs["pk"]}', obj)
-            print("Object not in cached. Get object and cache it...", obj)
+            logger.warning(f"Object not in cached. Get object and cache it -> {obj}",)
         return obj
-
 
 
 class NewsSearchList(ListView):
@@ -127,7 +129,9 @@ class PostCreate(PermissionRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['is_author'] = user_is_author(self.request)
-        context['post_creation_at_limit'] = Author.objects.get(id=self.request.user.id).post_creation_limit()
+        context['post_creation_at_limit'] = Author.objects.get(author_user_id=self.request.user.id).post_creation_limit
+        if context['post_creation_at_limit']:
+            logger.warning("Current author cannot make more posts today...")
         return context
 
     def form_valid(self, form):
