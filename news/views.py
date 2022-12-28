@@ -18,7 +18,7 @@ from .forms import PostForm
 import os
 import logging
 
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 
 def user_is_author(request):

@@ -201,6 +201,12 @@ APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 
 APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
 
+ADMINS = [
+    ('Alex', os.getenv('ADMIN_EMAIL')),
+]
+
+SERVER_EMAIL = EMAIL_HOST_USER
+
 
 LOGGING = {
     'version': 1,
@@ -265,7 +271,6 @@ LOGGING = {
             'formatter': 'error'
         },
         'security': {
-            'level': 'WARNING',
             'filters': ['require_debug_true'],
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, "security.log"),
@@ -281,6 +286,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console_debug', 'console_warning', 'console_error', 'file_info'],
+            'level': 'DEBUG',
             'propagate': True,
         },
         'django.request': {
@@ -305,7 +311,6 @@ LOGGING = {
         },
         'django.security': {
             'handlers': ['security'],
-            'level': 'WARNING',
             'propagate': False,
         },
     }
